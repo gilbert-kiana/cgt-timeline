@@ -3,17 +3,17 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { useTimelineStore } from '@/store/timeline';
-import { 
-  ZoomIn, 
-  ZoomOut, 
+import {
+  ZoomIn,
+  ZoomOut,
   Calendar,
   Download,
   Upload,
   Settings,
-  ChevronLeft,
-  ChevronRight,
-  Maximize2,
-  List
+  Database,
+  Trash2,
+  Moon,
+  Sun
 } from 'lucide-react';
 
 export default function TimelineControls() {
@@ -26,7 +26,16 @@ export default function TimelineControls() {
     timelineEnd,
     setTimelineRange,
     properties,
-    events
+    events,
+    loadDemoData,
+    clearAllData,
+    setZoomByIndex,
+    getZoomLevelIndex,
+    absoluteStart,
+    absoluteEnd,
+    panToPosition,
+    isDarkMode,
+    toggleDarkMode
   } = useTimelineStore();
 
   // Get zoom level label for display
@@ -43,6 +52,20 @@ export default function TimelineControls() {
 
   const canZoomIn = zoomLevel !== 'days';
   const canZoomOut = zoomLevel !== 'decade';
+
+  // Smooth panning slider - uses absolute timeline positions
+  const getPanSliderValue = () => {
+    // Calculate center of current view as percentage of absolute timeline
+    const centerTime = (timelineStart.getTime() + timelineEnd.getTime()) / 2;
+    const absoluteRange = absoluteEnd.getTime() - absoluteStart.getTime();
+    const offset = centerTime - absoluteStart.getTime();
+    const percentage = (offset / absoluteRange) * 100;
+    return Math.max(0, Math.min(100, percentage));
+  };
+
+  const handlePanSliderChange = (percentage: number) => {
+    panToPosition(percentage);
+  };
 
   const handleExport = () => {
     // Transform data to custom format
@@ -90,7 +113,7 @@ export default function TimelineControls() {
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
@@ -105,110 +128,126 @@ export default function TimelineControls() {
     reader.readAsText(file);
   };
 
-  const shiftTimeline = (months: number) => {
-    const newStart = new Date(timelineStart);
-    const newEnd = new Date(timelineEnd);
-    newStart.setMonth(newStart.getMonth() + months);
-    newEnd.setMonth(newEnd.getMonth() + months);
-
-    // Don't allow the timeline to go past today's date
-    const today = new Date();
-    if (months > 0 && newEnd > today) {
-      return; // Don't shift forward past today
-    }
-
-    setTimelineRange(newStart, newEnd);
-  };
-
-  // Check if we can shift forward (would the new end date exceed today?)
-  const canShiftForward = () => {
-    const testEnd = new Date(timelineEnd);
-    testEnd.setMonth(testEnd.getMonth() + 12);
-    const today = new Date();
-    return testEnd <= today;
-  };
-
   return (
-    <div className="absolute top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between z-30">
+    <div className="absolute top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 flex items-center justify-between z-30">
       {/* Left Controls */}
       <div className="flex items-center gap-4">
-        <h1 className="text-xl font-bold text-slate-800">CGT Brain AI Timeline</h1>
-        <div className="flex items-center gap-2 border-l border-slate-200 pl-4">
-          <span className="text-sm text-slate-500">
+        <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">CGT Brain AI Timeline</h1>
+        <div className="flex items-center gap-2 border-l border-slate-200 dark:border-slate-700 pl-4">
+          <span className="text-sm text-slate-500 dark:text-slate-400">
             {properties.length} {properties.length === 1 ? 'Property' : 'Properties'}
           </span>
-          <span className="text-slate-300">•</span>
-          <span className="text-sm text-slate-500">
+          <span className="text-slate-300 dark:text-slate-600">•</span>
+          <span className="text-sm text-slate-500 dark:text-slate-400">
             {events.length} {events.length === 1 ? 'Event' : 'Events'}
           </span>
         </div>
       </div>
 
       {/* Center Controls - Timeline Navigation */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => shiftTimeline(-12)}
-          className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-          title="Previous Year"
-        >
-          <ChevronLeft className="w-4 h-4 text-slate-600" />
-        </button>
-        
-        <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-lg">
-          <Calendar className="w-4 h-4 text-slate-500" />
-          <span className="text-sm text-slate-700">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 dark:bg-slate-800 rounded-lg">
+          <Calendar className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+          <span className="text-sm text-slate-700 dark:text-slate-300">
             {format(timelineStart, 'MMM yyyy')} - {format(timelineEnd, 'MMM yyyy')}
           </span>
         </div>
-        
-        <button
-          onClick={() => shiftTimeline(12)}
-          className="p-2 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Next Year"
-          disabled={!canShiftForward()}
-        >
-          <ChevronRight className="w-4 h-4 text-slate-600" />
-        </button>
+
+        <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg">
+          <span className="text-xs text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">Pan</span>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={0.01}
+            value={getPanSliderValue()}
+            onChange={(e) => handlePanSliderChange(parseFloat(e.target.value))}
+            className="w-48 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer
+              [&::-webkit-slider-thumb]:appearance-none
+              [&::-webkit-slider-thumb]:w-3
+              [&::-webkit-slider-thumb]:h-3
+              [&::-webkit-slider-thumb]:rounded-full
+              [&::-webkit-slider-thumb]:bg-blue-600
+              [&::-webkit-slider-thumb]:cursor-pointer
+              [&::-webkit-slider-thumb]:hover:bg-blue-700
+              [&::-webkit-slider-thumb]:transition-colors
+              [&::-moz-range-thumb]:w-3
+              [&::-moz-range-thumb]:h-3
+              [&::-moz-range-thumb]:rounded-full
+              [&::-moz-range-thumb]:bg-blue-600
+              [&::-moz-range-thumb]:border-0
+              [&::-moz-range-thumb]:cursor-pointer
+              [&::-moz-range-thumb]:hover:bg-blue-700"
+            title="Smooth timeline navigation"
+          />
+        </div>
       </div>
 
       {/* Right Controls */}
       <div className="flex items-center gap-2">
+        {/* Zoom Slider */}
+        <div className="flex items-center gap-2 border-r border-slate-200 pr-2">
+          <input
+            type="range"
+            min="0"
+            max="7"
+            value={getZoomLevelIndex()}
+            onChange={(e) => setZoomByIndex(parseInt(e.target.value))}
+            className="w-32 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer
+              [&::-webkit-slider-thumb]:appearance-none
+              [&::-webkit-slider-thumb]:w-4
+              [&::-webkit-slider-thumb]:h-4
+              [&::-webkit-slider-thumb]:rounded-full
+              [&::-webkit-slider-thumb]:bg-slate-600
+              [&::-webkit-slider-thumb]:cursor-pointer
+              [&::-webkit-slider-thumb]:hover:bg-slate-700
+              [&::-moz-range-thumb]:w-4
+              [&::-moz-range-thumb]:h-4
+              [&::-moz-range-thumb]:rounded-full
+              [&::-moz-range-thumb]:bg-slate-600
+              [&::-moz-range-thumb]:border-0
+              [&::-moz-range-thumb]:cursor-pointer
+              [&::-moz-range-thumb]:hover:bg-slate-700"
+            title="Zoom Level Slider"
+          />
+        </div>
+
         {/* Zoom Controls */}
-        <div className="flex items-center gap-1 border-r border-slate-200 pr-2">
+        <div className="flex items-center gap-1 border-r border-slate-200 dark:border-slate-700 pr-2">
           <button
             onClick={zoomOut}
-            className="p-2 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!canZoomOut}
             title="Zoom Out"
           >
-            <ZoomOut className="w-4 h-4 text-slate-600" />
+            <ZoomOut className="w-4 h-4 text-slate-600 dark:text-slate-300" />
           </button>
-          <div className="px-3 py-1 bg-slate-100 rounded-lg min-w-[120px] text-center">
-            <div className="text-xs font-semibold text-slate-700">
+          <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg min-w-[120px] text-center">
+            <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">
               {zoomLevelLabels[zoomLevel]}
             </div>
           </div>
           <button
             onClick={zoomIn}
-            className="p-2 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!canZoomIn}
             title="Zoom In"
           >
-            <ZoomIn className="w-4 h-4 text-slate-600" />
+            <ZoomIn className="w-4 h-4 text-slate-600 dark:text-slate-300" />
           </button>
         </div>
 
         {/* Action Buttons */}
         <button
           onClick={handleExport}
-          className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
           title="Export Timeline"
         >
-          <Download className="w-4 h-4 text-slate-600" />
+          <Download className="w-4 h-4 text-slate-600 dark:text-slate-300" />
         </button>
-        
-        <label className="p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
-          <Upload className="w-4 h-4 text-slate-600" />
+
+        <label className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
+          <Upload className="w-4 h-4 text-slate-600 dark:text-slate-300" />
           <input
             type="file"
             accept=".json"
@@ -218,11 +257,39 @@ export default function TimelineControls() {
         </label>
 
         <button
+          onClick={loadDemoData}
+          className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+          title="Load Demo Data"
+        >
+          <Database className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+        </button>
+
+        <button
+          onClick={clearAllData}
+          className="p-2 hover:bg-red-50 hover:bg-opacity-50 rounded-lg transition-colors"
+          title="Clear All Data"
+        >
+          <Trash2 className="w-4 h-4 text-red-600" />
+        </button>
+
+        <button
+          onClick={toggleDarkMode}
+          className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+          title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          {isDarkMode ? (
+            <Sun className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+          ) : (
+            <Moon className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+          )}
+        </button>
+
+        <button
           onClick={() => setShowSettings(!showSettings)}
-          className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+          className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
           title="Settings"
         >
-          <Settings className="w-4 h-4 text-slate-600" />
+          <Settings className="w-4 h-4 text-slate-600 dark:text-slate-300" />
         </button>
       </div>
     </div>

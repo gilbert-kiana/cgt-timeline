@@ -103,12 +103,12 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden"
+          className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div
-            className="px-6 py-4 border-b border-slate-200"
+            className="px-6 py-4 border-b border-slate-200 dark:border-slate-700"
             style={{ backgroundColor: `${event.color}15` }}
           >
             <div className="flex items-center justify-between">
@@ -120,15 +120,15 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
                   <Home className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-slate-800">{event.title}</h2>
-                  <p className="text-sm text-slate-500">{propertyName}</p>
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">{event.title}</h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{propertyName}</p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-slate-500" />
+                <X className="w-5 h-5 text-slate-500 dark:text-slate-400" />
               </button>
             </div>
           </div>
@@ -136,9 +136,9 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
           {/* Content */}
           <div className="p-6 space-y-5 max-h-[60vh] overflow-y-auto">
             {/* Event Type Badge */}
-            <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
-              <Tag className="w-4 h-4 text-slate-500" />
-              <span className="text-sm text-slate-600">Event Type:</span>
+            <div className="flex items-center gap-2 pb-4 border-b border-slate-100 dark:border-slate-700">
+              <Tag className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+              <span className="text-sm text-slate-600 dark:text-slate-400">Event Type:</span>
               <span
                 className="px-3 py-1 rounded-full text-xs font-semibold text-white"
                 style={{ backgroundColor: event.color }}
@@ -146,7 +146,7 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
                 {event.type.replace('_', ' ').toUpperCase()}
               </span>
               {isPPR && (
-                <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 flex items-center gap-1">
+                <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 flex items-center gap-1">
                   <CheckCircle className="w-3 h-3" />
                   PPR
                 </span>
@@ -155,11 +155,11 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
 
             {/* Basic Information Section */}
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Basic Information</h3>
+              <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Basic Information</h3>
 
               {/* Title Input */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   <FileText className="w-4 h-4" />
                   Title *
                 </label>
@@ -167,7 +167,7 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Event title"
                   required
                 />
@@ -175,7 +175,7 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
 
               {/* Date Input */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   <Calendar className="w-4 h-4" />
                   Date *
                 </label>
@@ -183,7 +183,7 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -191,21 +191,21 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
 
             {/* Financial Details Section */}
             <div className="space-y-4 pt-2">
-              <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Financial Details</h3>
+              <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Financial Details</h3>
 
               {/* Amount Input */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   <DollarSign className="w-4 h-4" />
                   Amount
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400">$</span>
                   <input
                     type="number"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="w-full pl-8 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-8 pr-4 py-2.5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="0.00"
                     step="0.01"
                   />
@@ -215,11 +215,11 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
 
             {/* Additional Information Section */}
             <div className="space-y-4 pt-2">
-              <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">Additional Information</h3>
+              <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Additional Information</h3>
 
               {/* Description Input */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   <FileText className="w-4 h-4" />
                   Notes
                 </label>
@@ -227,26 +227,26 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                   placeholder="Add notes about this event..."
                 />
               </div>
 
               {/* PPR Checkbox */}
-              <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+              <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-800">
                 <input
                   type="checkbox"
                   id="isPPR-modal"
                   checked={isPPR}
                   onChange={(e) => setIsPPR(e.target.checked)}
-                  className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500 mt-0.5"
+                  className="w-5 h-5 text-green-600 border-gray-300 dark:border-gray-600 rounded focus:ring-green-500 mt-0.5"
                 />
-                <label htmlFor="isPPR-modal" className="text-sm font-medium text-slate-700 cursor-pointer flex-1">
+                <label htmlFor="isPPR-modal" className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <Home className="w-4 h-4 text-green-600" />
+                    <Home className="w-4 h-4 text-green-600 dark:text-green-400" />
                     Principal Place of Residence (PPR)
                   </div>
-                  <p className="text-xs text-slate-600 leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                     Mark this event as related to your main residence. Important for CGT main residence exemption eligibility.
                   </p>
                 </label>
@@ -256,14 +256,14 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
             {/* Status Change Dropdown (if applicable) */}
             {event.type === 'status_change' && (
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   <Home className="w-4 h-4" />
                   New Status
                 </label>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value as PropertyStatus)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select status...</option>
                   <option value="ppr">Principal Place of Residence</option>
@@ -277,18 +277,18 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200">
+          <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
             {/* Keyboard shortcuts hint */}
-            <div className="text-xs text-slate-500 mb-3 flex items-center gap-4">
-              <span>💡 Tip: Press <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-700 font-mono">Esc</kbd> to cancel</span>
-              <span>Press <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-slate-700 font-mono">Ctrl+Enter</kbd> to save</span>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-4">
+              <span>💡 Tip: Press <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded text-slate-700 dark:text-slate-300 font-mono">Esc</kbd> to cancel</span>
+              <span>Press <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded text-slate-700 dark:text-slate-300 font-mono">Ctrl+Enter</kbd> to save</span>
             </div>
 
             <div className="flex items-center justify-between">
               <button
                 onClick={handleDelete}
                 disabled={isSaving}
-                className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Delete Event
               </button>
@@ -296,7 +296,7 @@ export default function EventDetailsModal({ event, onClose, propertyName }: Even
                 <button
                   onClick={onClose}
                   disabled={isSaving}
-                  className="px-5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-5 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel
                 </button>

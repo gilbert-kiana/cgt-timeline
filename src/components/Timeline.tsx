@@ -119,15 +119,15 @@ export default function Timeline({ className }: TimelineProps) {
   }, [isDragging, draggedEventId, moveEvent]);
 
   return (
-    <div className={cn('relative w-full h-full bg-gradient-to-br from-slate-50 to-slate-100', className)}>
+    <div className={cn('relative w-full h-full bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800', className)}>
       {/* Controls */}
       <TimelineControls />
-      
+
       {/* Main Timeline Container */}
       <div className="relative h-full pt-20 pb-24 px-8">
         <div
           ref={timelineRef}
-          className="timeline-scroll relative h-full bg-white rounded-2xl shadow-lg border border-slate-200 overflow-y-auto overflow-x-hidden transition-all duration-300"
+          className="timeline-scroll relative h-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-y-auto overflow-x-hidden transition-all duration-300"
           onClick={handleTimelineClick}
           onMouseMove={handleMouseMove}
           onMouseLeave={() => setHoveredDate(null)}
@@ -143,7 +143,7 @@ export default function Timeline({ className }: TimelineProps) {
             </div>
 
             {/* Timeline Markers - Sticky */}
-            <div className="sticky top-0 left-0 right-0 h-12 border-b border-slate-200 bg-slate-50 z-20">
+            <div className="sticky top-0 left-0 right-0 h-12 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 z-20">
             {timelineMarkers.map((marker, index) => {
               const isYear = marker.type === 'year';
               const isMinor = marker.isMinor;
@@ -157,8 +157,8 @@ export default function Timeline({ className }: TimelineProps) {
                   <div
                     className={cn(
                       'px-2 whitespace-nowrap',
-                      isYear ? 'font-bold text-slate-800 text-sm' : 'font-medium text-slate-600 text-xs',
-                      isMinor && 'text-slate-400'
+                      isYear ? 'font-bold text-slate-800 dark:text-slate-200 text-sm' : 'font-medium text-slate-600 dark:text-slate-400 text-xs',
+                      isMinor && 'text-slate-400 dark:text-slate-600'
                     )}
                   >
                     {marker.label}
@@ -166,7 +166,7 @@ export default function Timeline({ className }: TimelineProps) {
                   <div
                     className={cn(
                       'absolute top-full h-full',
-                      isYear ? 'w-0.5 bg-slate-300' : isMinor ? 'w-px bg-slate-100' : 'w-px bg-slate-200'
+                      isYear ? 'w-0.5 bg-slate-300 dark:bg-slate-600' : isMinor ? 'w-px bg-slate-100 dark:bg-slate-800' : 'w-px bg-slate-200 dark:bg-slate-700'
                     )}
                   />
                 </div>
@@ -211,13 +211,13 @@ export default function Timeline({ className }: TimelineProps) {
             {properties.length === 0 && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-slate-700 mb-2">
+                  <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">
                     Welcome to CGT Timeline
                   </h3>
-                  <p className="text-slate-500 mb-4">
+                  <p className="text-slate-500 dark:text-slate-400 mb-4">
                     Click anywhere on the timeline to add your first property
                   </p>
-                  <div className="flex items-center justify-center gap-2 text-slate-400">
+                  <div className="flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2z" />
                     </svg>

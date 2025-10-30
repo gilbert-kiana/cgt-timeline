@@ -66,6 +66,7 @@ interface TimelineState {
   events: TimelineEvent[];
   selectedProperty: string | null;
   selectedEvent: string | null;
+  lastInteractedEventId: string | null; // Last selected, edited, or added event
   timelineStart: Date; // Currently visible start
   timelineEnd: Date; // Currently visible end
   absoluteStart: Date; // Earliest possible date (based on data)
@@ -73,6 +74,7 @@ interface TimelineState {
   zoom: number;
   zoomLevel: ZoomLevel;
   centerDate: Date; // The date at the center of the viewport
+  isDarkMode: boolean; // Dark mode toggle
 
   // Actions
   addProperty: (property: Omit<Property, 'id' | 'branch'>) => void;
@@ -91,10 +93,13 @@ interface TimelineState {
   setTimelineRange: (start: Date, end: Date) => void;
   zoomIn: () => void;
   zoomOut: () => void;
+  setZoomByIndex: (index: number) => void; // Set zoom level by index (0-7)
+  getZoomLevelIndex: () => number; // Get current zoom level index (0-7)
   setCenterDate: (date: Date) => void;
   panToPosition: (position: number) => void; // Position 0-100 on absolute timeline
   loadDemoData: () => void; // Load demo data from Excel sheet
   clearAllData: () => void; // Clear all properties and events
+  toggleDarkMode: () => void; // Toggle dark mode
 }
 
 const propertyColors = [
@@ -128,7 +133,7 @@ export const statusColors: Record<PropertyStatus, string> = {
 };
 
 // Zoom level definitions with their time spans in days
-const zoomLevels: Array<{ level: ZoomLevel; minDays: number; maxDays: number; label: string }> = [
+export const zoomLevels: Array<{ level: ZoomLevel; minDays: number; maxDays: number; label: string }> = [
   { level: 'decade', minDays: 3650, maxDays: Infinity, label: '10+ Years' },
   { level: 'multi-year', minDays: 1825, maxDays: 3650, label: '5-10 Years' },
   { level: 'years', minDays: 730, maxDays: 1825, label: '2-5 Years' },
@@ -267,7 +272,7 @@ export const calculateStatusPeriods = (events: TimelineEvent[]): StatusPeriod[] 
   return periods;
 };
 
-const defaultAbsoluteStart = new Date(2015, 0, 1);
+const defaultAbsoluteStart = new Date(1900, 0, 1);
 const defaultAbsoluteEnd = new Date();
 
 export const useTimelineStore = create<TimelineState>((set, get) => ({
@@ -275,6 +280,7 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
   events: [],
   selectedProperty: null,
   selectedEvent: null,
+  lastInteractedEventId: null,
   timelineStart: new Date(2020, 0, 1),
   timelineEnd: new Date(), // Today's date
   absoluteStart: defaultAbsoluteStart,
@@ -284,6 +290,7 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
   centerDate: new Date(
     (new Date(2020, 0, 1).getTime() + new Date().getTime()) / 2
   ),
+  isDarkMode: false,
   
   addProperty: (property) => {
     const properties = get().properties;
@@ -317,15 +324,25 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
       id: `event-${Date.now()}`,
       color: event.color || eventColors[event.type],
     };
-    set((state) => ({ events: [...state.events, newEvent] }));
+    set((state) => ({
+      events: [...state.events, newEvent],
+      lastInteractedEventId: newEvent.id,
+      centerDate: newEvent.date
+    }));
   },
   
   updateEvent: (id, updates) => {
-    set((state) => ({
-      events: state.events.map((e) =>
+    set((state) => {
+      const updatedEvents = state.events.map((e) =>
         e.id === id ? { ...e, ...updates } : e
-      ),
-    }));
+      );
+      const updatedEvent = updatedEvents.find(e => e.id === id);
+      return {
+        events: updatedEvents,
+        lastInteractedEventId: id,
+        centerDate: updatedEvent?.date || state.centerDate
+      };
+    });
   },
   
   deleteEvent: (id) => {
@@ -351,18 +368,34 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
   },
   
   selectProperty: (id) => set({ selectedProperty: id }),
-  selectEvent: (id) => set({ selectedEvent: id }),
+  selectEvent: (id) => {
+    const state = get();
+    const event = state.events.find(e => e.id === id);
+    set({
+      selectedEvent: id,
+      lastInteractedEventId: id,
+      centerDate: event?.date || state.centerDate
+    });
+  },
 
   setZoom: (zoom) => set({ zoom: Math.max(0.5, Math.min(3, zoom)) }),
 
   setTimelineRange: (start, end) => {
+    const state = get();
     const newCenterDate = new Date((start.getTime() + end.getTime()) / 2);
     const newZoomLevel = calculateZoomLevel(start, end);
+
+    // Expand absolute range if needed to accommodate the new range
+    const newAbsoluteStart = start < state.absoluteStart ? start : state.absoluteStart;
+    const newAbsoluteEnd = end > state.absoluteEnd ? end : state.absoluteEnd;
+
     set({
       timelineStart: start,
       timelineEnd: end,
       centerDate: newCenterDate,
       zoomLevel: newZoomLevel,
+      absoluteStart: newAbsoluteStart,
+      absoluteEnd: newAbsoluteEnd,
     });
   },
 
@@ -396,6 +429,26 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
     }
   },
 
+  setZoomByIndex: (index: number) => {
+    const state = get();
+    const clampedIndex = Math.max(0, Math.min(zoomLevels.length - 1, index));
+    const targetLevel = zoomLevels[clampedIndex].level;
+
+    if (targetLevel !== state.zoomLevel) {
+      const { start, end } = calculateDateRange(state.centerDate, targetLevel);
+      set({
+        timelineStart: start,
+        timelineEnd: end,
+        zoomLevel: targetLevel,
+      });
+    }
+  },
+
+  getZoomLevelIndex: () => {
+    const state = get();
+    return zoomLevels.findIndex(z => z.level === state.zoomLevel);
+  },
+
   panToPosition: (position: number) => {
     const state = get();
     const absoluteRange = state.absoluteEnd.getTime() - state.absoluteStart.getTime();
@@ -409,5 +462,213 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
       timelineEnd: end,
       centerDate: newCenterDate,
     });
+  },
+
+  loadDemoData: () => {
+    const demoProperties: Property[] = [];
+    const demoEvents: TimelineEvent[] = [];
+
+    // Property 1: 45 Collard Road, Humpty Doo
+    const prop1 = {
+      id: 'demo-prop-1',
+      name: 'Humpty Doo, NT 0836',
+      address: '45 Collard Road',
+      color: propertyColors[0],
+      purchasePrice: 106000,
+      purchaseDate: new Date(2003, 0, 1),
+      salePrice: 450000,
+      saleDate: new Date(2023, 6, 14),
+      currentStatus: 'sold' as PropertyStatus,
+      branch: 0,
+    };
+    demoProperties.push(prop1);
+
+    // Events for Property 1
+    demoEvents.push({
+      id: 'demo-event-1-1',
+      propertyId: prop1.id,
+      type: 'purchase',
+      date: new Date(2003, 0, 1),
+      title: 'Purchase',
+      amount: 106000,
+      position: 0,
+      color: eventColors.purchase,
+      isPPR: true,
+    });
+
+    demoEvents.push({
+      id: 'demo-event-1-2',
+      propertyId: prop1.id,
+      type: 'move_in',
+      date: new Date(2003, 0, 1),
+      title: 'Move In',
+      position: 0,
+      color: eventColors.move_in,
+      isPPR: true,
+    });
+
+    demoEvents.push({
+      id: 'demo-event-1-3',
+      propertyId: prop1.id,
+      type: 'rent_start',
+      date: new Date(2020, 0, 1),
+      title: 'Start Rent',
+      position: 0,
+      color: eventColors.rent_start,
+    });
+
+    demoEvents.push({
+      id: 'demo-event-1-4',
+      propertyId: prop1.id,
+      type: 'sale',
+      date: new Date(2023, 6, 14),
+      title: 'Sold as PPR',
+      amount: 450000,
+      position: 0,
+      color: eventColors.sale,
+      isPPR: true,
+      contractDate: new Date(2023, 6, 14),
+    });
+
+    // Property 2: 50 Flynn Circuit, Bellamack
+    const prop2 = {
+      id: 'demo-prop-2',
+      name: 'Bellamack, NT 0832',
+      address: '50 Flynn Circuit',
+      color: propertyColors[1],
+      purchasePrice: 705000,
+      purchaseDate: new Date(2014, 5, 5),
+      currentStatus: 'rental' as PropertyStatus,
+      branch: 1,
+    };
+    demoProperties.push(prop2);
+
+    demoEvents.push({
+      id: 'demo-event-2-1',
+      propertyId: prop2.id,
+      type: 'purchase',
+      date: new Date(2014, 5, 5),
+      title: 'Purchase',
+      amount: 705000,
+      position: 0,
+      color: eventColors.purchase,
+    });
+
+    demoEvents.push({
+      id: 'demo-event-2-2',
+      propertyId: prop2.id,
+      type: 'rent_start',
+      date: new Date(2014, 5, 20),
+      title: 'Start Rent',
+      position: 0,
+      color: eventColors.rent_start,
+    });
+
+    // Property 3: 5 Wanda Dr, Boyne Island
+    const prop3 = {
+      id: 'demo-prop-3',
+      name: 'Boyne Island, Qld 4680',
+      address: '5 Wanda Dr',
+      color: propertyColors[2],
+      purchasePrice: 530000,
+      purchaseDate: new Date(2021, 8, 30),
+      currentStatus: 'ppr' as PropertyStatus,
+      branch: 2,
+    };
+    demoProperties.push(prop3);
+
+    demoEvents.push({
+      id: 'demo-event-3-1',
+      propertyId: prop3.id,
+      type: 'purchase',
+      date: new Date(2021, 8, 30),
+      title: 'Purchase',
+      amount: 530000,
+      position: 0,
+      color: eventColors.purchase,
+      isPPR: true,
+    });
+
+    demoEvents.push({
+      id: 'demo-event-3-2',
+      propertyId: prop3.id,
+      type: 'move_in',
+      date: new Date(2021, 8, 30),
+      title: 'Move In',
+      position: 0,
+      color: eventColors.move_in,
+      isPPR: true,
+    });
+
+    demoEvents.push({
+      id: 'demo-event-3-3',
+      propertyId: prop3.id,
+      type: 'improvement',
+      date: new Date(2022, 3, 15),
+      title: 'Renovation',
+      amount: 45000,
+      position: 0,
+      color: eventColors.improvement,
+      description: 'Kitchen and bathroom renovation',
+    });
+
+    // Property 4: Boyne Island Rental (Living as tenant)
+    const prop4 = {
+      id: 'demo-prop-4',
+      name: 'Boyne Island Rental, Qld 4680',
+      address: 'Rental Property',
+      color: propertyColors[3],
+      currentStatus: 'rental' as PropertyStatus,
+      branch: 3,
+    };
+    demoProperties.push(prop4);
+
+    demoEvents.push({
+      id: 'demo-event-4-1',
+      propertyId: prop4.id,
+      type: 'move_in',
+      date: new Date(2020, 0, 1),
+      title: 'Living in Rental',
+      position: 0,
+      color: eventColors.move_in,
+      description: 'Living in a rental property',
+    });
+
+    // Set the demo data
+    set({
+      properties: demoProperties,
+      events: demoEvents,
+      timelineStart: new Date(2003, 0, 1),
+      timelineEnd: new Date(),
+      absoluteStart: new Date(2003, 0, 1),
+      absoluteEnd: new Date(),
+      centerDate: new Date(2013, 0, 1),
+      zoomLevel: 'decade',
+    });
+  },
+
+  clearAllData: () => {
+    set({
+      properties: [],
+      events: [],
+      selectedProperty: null,
+      selectedEvent: null,
+      lastInteractedEventId: null,
+    });
+  },
+
+  toggleDarkMode: () => {
+    const state = get();
+    const newDarkMode = !state.isDarkMode;
+    set({ isDarkMode: newDarkMode });
+
+    // Update document class for Tailwind dark mode
+    if (typeof window !== 'undefined') {
+      if (newDarkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
   },
 }));

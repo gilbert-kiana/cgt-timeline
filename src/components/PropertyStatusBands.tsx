@@ -67,7 +67,7 @@ export default function PropertyStatusBands({
                 y={bandY + bandHeight / 2}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="text-[10px] font-bold fill-slate-800"
+                className="text-[12px] font-bold fill-slate-900 dark:fill-slate-100"
                 style={{ pointerEvents: 'none' }}
               >
                 {statusLabels[period.status]}

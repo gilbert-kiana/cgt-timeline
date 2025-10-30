@@ -104,9 +104,16 @@ export default function TimelineSlider() {
     const yearSpan = endYear - startYear;
 
     // Show fewer markers if too many years
-    const step = yearSpan > 20 ? 5 : yearSpan > 10 ? 2 : 1;
+    let step = 1;
+    if (yearSpan > 100) step = 20;
+    else if (yearSpan > 50) step = 10;
+    else if (yearSpan > 20) step = 5;
+    else if (yearSpan > 10) step = 2;
 
-    for (let year = startYear; year <= endYear; year += step) {
+    // Round start year to nearest step
+    const firstYear = Math.ceil(startYear / step) * step;
+
+    for (let year = firstYear; year <= endYear; year += step) {
       const date = new Date(year, 0, 1);
       const absoluteRange = absoluteEnd.getTime() - absoluteStart.getTime();
       const offset = date.getTime() - absoluteStart.getTime();
@@ -123,7 +130,7 @@ export default function TimelineSlider() {
   const markers = generateSliderMarkers();
 
   return (
-    <div className="relative w-full h-16 bg-white border-t border-slate-200 px-8 py-3">
+    <div className="relative w-full h-16 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 px-8 py-3">
       <div
         ref={sliderRef}
         className="relative w-full h-full cursor-pointer"
@@ -133,15 +140,15 @@ export default function TimelineSlider() {
         onMouseMove={handleReactMouseMove}
       >
         {/* Slider Track */}
-        <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 bg-slate-200 rounded-full">
+        <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full">
           {/* Year Markers */}
           {markers.map(({ year, position }) => (
             <div
               key={year}
-              className="absolute top-1/2 -translate-y-1/2 w-px h-4 bg-slate-300"
+              className="absolute top-1/2 -translate-y-1/2 w-px h-4 bg-slate-300 dark:bg-slate-600"
               style={{ left: `${position}%` }}
             >
-              <div className="absolute top-full mt-1 -translate-x-1/2 text-[10px] text-slate-500 whitespace-nowrap">
+              <div className="absolute top-full mt-1 -translate-x-1/2 text-[10px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
                 {year}
               </div>
             </div>

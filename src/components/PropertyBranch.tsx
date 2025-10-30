@@ -40,14 +40,63 @@ export default function PropertyBranch({
   const sortedEvents = [...eventsWithPositions].sort((a, b) =>
     a.date.getTime() - b.date.getTime()
   );
-  
+
+  // Assign tiers to avoid label overlap
+  const assignLabelTiers = () => {
+    const LABEL_MIN_SPACING = 8; // Minimum horizontal spacing in percentage points
+    const MAX_TIERS = 4; // Maximum number of tiers
+
+    interface PlacedLabel {
+      startPos: number;
+      endPos: number;
+      tier: number;
+    }
+
+    const placedLabels: PlacedLabel[] = [];
+
+    return sortedEvents.map((event) => {
+      // Estimate label width based on title length (rough approximation)
+      const estimatedLabelWidth = Math.min(event.title.length * 0.5, 12); // in percentage points
+      const startPos = event.calculatedPosition - estimatedLabelWidth / 2;
+      const endPos = event.calculatedPosition + estimatedLabelWidth / 2;
+
+      // Find the lowest tier where this label doesn't overlap with existing labels
+      let assignedTier = 0;
+
+      for (let tier = 0; tier < MAX_TIERS; tier++) {
+        const labelsInTier = placedLabels.filter(l => l.tier === tier);
+
+        // Check if there's overlap with any label in this tier
+        const hasOverlap = labelsInTier.some(placed => {
+          return !(endPos + LABEL_MIN_SPACING < placed.startPos ||
+                   startPos - LABEL_MIN_SPACING > placed.endPos);
+        });
+
+        if (!hasOverlap) {
+          assignedTier = tier;
+          break;
+        }
+      }
+
+      // Place the label
+      placedLabels.push({ startPos, endPos, tier: assignedTier });
+
+      return {
+        ...event,
+        tier: assignedTier
+      };
+    });
+  };
+
+  const eventsWithTiers = assignLabelTiers();
+
   // Generate branch path
   const generateBranchPath = () => {
-    if (sortedEvents.length === 0) return '';
+    if (eventsWithTiers.length === 0) return '';
 
     let path = `M 0,${branchY}`;
 
-    sortedEvents.forEach((event, index) => {
+    eventsWithTiers.forEach((event, index) => {
       const x = `${event.calculatedPosition}%`;
 
       if (index === 0) {
@@ -102,7 +151,9 @@ export default function PropertyBranch({
           />
           <span className={cn(
             "font-semibold text-sm transition-all",
-            isSelected ? "text-slate-900" : "text-slate-600"
+            isSelected
+              ? "text-slate-900 dark:text-slate-100"
+              : "text-slate-600 dark:text-slate-400"
           )}>
             {property.name}
           </span>
@@ -110,7 +161,7 @@ export default function PropertyBranch({
       </foreignObject>
       
       {/* Event Circles */}
-      {sortedEvents.map((event) => (
+      {eventsWithTiers.map((event) => (
         <EventCircle
           key={event.id}
           event={event}
@@ -118,6 +169,7 @@ export default function PropertyBranch({
           cy={branchY}
           color={event.color}
           onClick={() => onEventClick(event)}
+          tier={event.tier}
         />
       ))}
     </g>

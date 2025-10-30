@@ -11,10 +11,17 @@ interface EventCircleProps {
   cy: number; // Y position
   color: string;
   onClick: () => void;
+  tier?: number; // Vertical tier for label positioning (0 = default, 1-3 = higher tiers)
 }
 
-export default function EventCircle({ event, cx, cy, color, onClick }: EventCircleProps) {
+export default function EventCircle({ event, cx, cy, color, onClick, tier = 0 }: EventCircleProps) {
   const [isHovered, setIsHovered] = useState(false);
+
+  // Calculate label Y position based on tier
+  // Each tier adds vertical space to avoid overlap
+  const TIER_SPACING = 18; // Pixels between tiers
+  const BASE_LABEL_OFFSET = 28; // Base offset from circle center
+  const labelY = cy + BASE_LABEL_OFFSET + (tier * TIER_SPACING);
 
   // Determine icon based on event type
   const getEventIcon = () => {
@@ -149,12 +156,27 @@ export default function EventCircle({ event, cx, cy, color, onClick }: EventCirc
         </foreignObject>
       )}
 
-      {/* Label below circle (always visible) */}
+      {/* Connecting line from circle to label (if label is offset) */}
+      {tier > 0 && (
+        <line
+          x1={cx}
+          x2={cx}
+          y1={cy + 14}
+          y2={labelY - 8}
+          stroke={color}
+          strokeWidth="1"
+          strokeDasharray="2,2"
+          opacity={0.5}
+          className="pointer-events-none"
+        />
+      )}
+
+      {/* Label below circle (positioned based on tier) */}
       <text
         x={cx}
-        y={cy + 28}
+        y={labelY}
         textAnchor="middle"
-        className="text-[11px] font-semibold fill-slate-700 pointer-events-none"
+        className="text-[14px] font-bold fill-slate-900 dark:fill-slate-100 pointer-events-none"
         style={{ userSelect: 'none' }}
       >
         {event.title}
