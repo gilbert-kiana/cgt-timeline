@@ -16,7 +16,6 @@ interface PropertyBranchProps {
   timelineStart: Date;
   timelineEnd: Date;
   onEventClick: (event: TimelineEvent) => void;
-  draggedEventId?: string | null;
 }
 
 export default function PropertyBranch({
@@ -28,7 +27,6 @@ export default function PropertyBranch({
   timelineStart,
   timelineEnd,
   onEventClick,
-  draggedEventId,
 }: PropertyBranchProps) {
   const branchY = 100 + branchIndex * 120; // Vertical spacing between branches
 
@@ -190,8 +188,6 @@ export default function PropertyBranch({
           cy={branchY}
           color={event.color}
           onClick={() => onEventClick(event)}
-          onDragStart={onDragStart}
-          isDragging={draggedEventId === event.id}
           tier={event.tier}
         />
       ))}
