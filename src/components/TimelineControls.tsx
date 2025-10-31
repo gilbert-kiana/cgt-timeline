@@ -129,10 +129,10 @@ export default function TimelineControls() {
   };
 
   return (
-    <div className="absolute top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 flex items-center justify-between z-30">
+    <div className="absolute top-0 left-0 right-0 h-16 bg-white dark:bg-black border-b border-slate-200 dark:border-slate-700 px-8 flex items-center justify-between z-30">
       {/* Left Controls */}
       <div className="flex items-center gap-4">
-        <h1 className="font-bold text-slate-800 dark:text-slate-100" style={{ fontSize: '12px' }}>CGT Brain AI Timeline</h1>
+        <h1 className="font-bold text-slate-800 dark:text-slate-100" style={{ fontSize: '14px' }}>CGT Brain AI Timeline</h1>
         <div className="flex items-center gap-2 border-l border-slate-200 dark:border-slate-700 pl-4">
           <span className="text-slate-500 dark:text-slate-400" style={{ fontSize: '12px' }}>
             {properties.length} {properties.length === 1 ? 'Property' : 'Properties'}
@@ -162,7 +162,7 @@ export default function TimelineControls() {
             step={0.01}
             value={getPanSliderValue()}
             onChange={(e) => handlePanSliderChange(parseFloat(e.target.value))}
-            className="w-48 h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer
+            className="w-36 h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer mr-[3px]
               [&::-webkit-slider-thumb]:appearance-none
               [&::-webkit-slider-thumb]:w-3
               [&::-webkit-slider-thumb]:h-3
@@ -185,56 +185,59 @@ export default function TimelineControls() {
 
       {/* Right Controls */}
       <div className="flex items-center gap-2">
-        {/* Zoom Slider */}
-        <div className="flex items-center gap-2 border-r border-slate-200 pr-2">
-          <input
-            type="range"
-            min="0"
-            max="7"
-            value={getZoomLevelIndex()}
-            onChange={(e) => setZoomByIndex(parseInt(e.target.value))}
-            className="w-32 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer
-              [&::-webkit-slider-thumb]:appearance-none
-              [&::-webkit-slider-thumb]:w-4
-              [&::-webkit-slider-thumb]:h-4
-              [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:bg-slate-600
-              [&::-webkit-slider-thumb]:cursor-pointer
-              [&::-webkit-slider-thumb]:hover:bg-slate-700
-              [&::-moz-range-thumb]:w-4
-              [&::-moz-range-thumb]:h-4
-              [&::-moz-range-thumb]:rounded-full
-              [&::-moz-range-thumb]:bg-slate-600
-              [&::-moz-range-thumb]:border-0
-              [&::-moz-range-thumb]:cursor-pointer
-              [&::-moz-range-thumb]:hover:bg-slate-700"
-            title="Zoom Level Slider"
-          />
-        </div>
-
-        {/* Zoom Controls */}
-        <div className="flex items-center gap-1 border-r border-slate-200 dark:border-slate-700 pr-2">
-          <button
-            onClick={zoomOut}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!canZoomOut}
-            title="Zoom Out"
-          >
-            <ZoomOut className="w-4 h-4 text-slate-600 dark:text-slate-300" />
-          </button>
-          <div className="px-3 py-1 min-w-[120px] text-center" style={{ backgroundColor: '#000000', borderRadius: '7px' }}>
-            <div className="font-semibold" style={{ color: '#FFFFFF', fontSize: '12px' }}>
-              {zoomLevelLabels[zoomLevel]}
-            </div>
+        {/* Zoom Controls - scaled to 3/4 size */}
+        <div className="scale-75 origin-left flex items-center gap-2">
+          {/* Zoom Slider */}
+          <div className="flex items-center gap-2 border-r border-slate-200 pr-2">
+            <input
+              type="range"
+              min="0"
+              max="7"
+              value={getZoomLevelIndex()}
+              onChange={(e) => setZoomByIndex(parseInt(e.target.value))}
+              className="w-32 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer
+                [&::-webkit-slider-thumb]:appearance-none
+                [&::-webkit-slider-thumb]:w-4
+                [&::-webkit-slider-thumb]:h-4
+                [&::-webkit-slider-thumb]:rounded-full
+                [&::-webkit-slider-thumb]:bg-slate-600
+                [&::-webkit-slider-thumb]:cursor-pointer
+                [&::-webkit-slider-thumb]:hover:bg-slate-700
+                [&::-moz-range-thumb]:w-4
+                [&::-moz-range-thumb]:h-4
+                [&::-moz-range-thumb]:rounded-full
+                [&::-moz-range-thumb]:bg-slate-600
+                [&::-moz-range-thumb]:border-0
+                [&::-moz-range-thumb]:cursor-pointer
+                [&::-moz-range-thumb]:hover:bg-slate-700"
+              title="Zoom Level Slider"
+            />
           </div>
-          <button
-            onClick={zoomIn}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!canZoomIn}
-            title="Zoom In"
-          >
-            <ZoomIn className="w-4 h-4 text-slate-600 dark:text-slate-300" />
-          </button>
+
+          {/* Zoom Controls */}
+          <div className="flex items-center gap-1 border-r border-slate-200 dark:border-slate-700 pr-2">
+            <button
+              onClick={zoomOut}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!canZoomOut}
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+            </button>
+            <div className="px-3 py-1 min-w-[120px] text-center" style={{ backgroundColor: '#000000', borderRadius: '7px' }}>
+              <div className="font-semibold" style={{ color: '#FFFFFF', fontSize: '12px' }}>
+                {zoomLevelLabels[zoomLevel]}
+              </div>
+            </div>
+            <button
+              onClick={zoomIn}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!canZoomIn}
+              title="Zoom In"
+            >
+              <ZoomIn className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+            </button>
+          </div>
         </div>
 
         {/* Action Buttons */}

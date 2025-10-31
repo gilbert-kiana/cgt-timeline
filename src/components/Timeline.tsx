@@ -119,7 +119,7 @@ export default function Timeline({ className }: TimelineProps) {
   }, [isDragging, draggedEventId, moveEvent]);
 
   return (
-    <div className={cn('relative w-full h-full', className)} style={{ backgroundColor: '#F8F8F6' }}>
+    <div className={cn('relative w-full h-full bg-[#F8F8F6] dark:bg-black', className)}>
       {/* Controls */}
       <TimelineControls />
 
@@ -127,16 +127,16 @@ export default function Timeline({ className }: TimelineProps) {
       <div className="relative h-full pt-20 pb-24 px-8">
         <div
           ref={timelineRef}
-          className="timeline-scroll relative h-full bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-y-auto overflow-x-hidden transition-all duration-300"
+          className="timeline-scroll relative h-full bg-white dark:bg-black rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-y-auto overflow-x-hidden transition-all duration-300"
           onClick={handleTimelineClick}
           onMouseMove={handleMouseMove}
           onMouseLeave={() => setHoveredDate(null)}
         >
           {/* Scrollable Content Wrapper */}
-          <div className="relative bg-white dark:from-slate-900 dark:to-slate-800" style={{ minHeight: `${minContentHeight}px` }}>
+          <div className="relative bg-white dark:bg-black" style={{ minHeight: `${minContentHeight}px` }}>
 
             {/* Timeline Markers - Sticky */}
-            <div className="sticky top-0 left-0 right-0 h-12 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 z-20">
+            <div className="sticky top-0 left-0 right-0 h-12 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-black z-20">
             {timelineMarkers.map((marker, index) => {
               const isYear = marker.type === 'year';
               const isMinor = marker.isMinor;
