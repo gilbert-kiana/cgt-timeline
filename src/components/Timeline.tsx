@@ -92,11 +92,11 @@ export default function Timeline({ className }: TimelineProps) {
     setDraggedEventId(null);
   };
 
-  // Handle drag move with pointer events
+  // Handle drag move
   useEffect(() => {
     if (!isDragging || !draggedEventId) return;
 
-    const handlePointerMove = (e: PointerEvent) => {
+    const handleMouseMove = (e: MouseEvent) => {
       const rect = timelineRef.current?.getBoundingClientRect();
       if (!rect) return;
       
@@ -105,29 +105,21 @@ export default function Timeline({ className }: TimelineProps) {
       moveEvent(draggedEventId, position);
     };
 
-    const handlePointerUp = () => {
+    const handleMouseUp = () => {
       handleDragEnd();
     };
 
-    document.addEventListener('pointermove', handlePointerMove);
-    document.addEventListener('pointerup', handlePointerUp);
-    document.addEventListener('pointercancel', handlePointerUp);
+    document.addEventListener('mousemove', handleMouseMove as any);
+    document.addEventListener('mouseup', handleMouseUp);
 
     return () => {
-      document.removeEventListener('pointermove', handlePointerMove);
-      document.removeEventListener('pointerup', handlePointerUp);
-      document.removeEventListener('pointercancel', handlePointerUp);
+      document.removeEventListener('mousemove', handleMouseMove as any);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging, draggedEventId, moveEvent]);
 
   return (
-    <div 
-      className={cn('relative w-full h-full', className)} 
-      style={{ 
-        backgroundColor: '#F8F8F6',
-        cursor: isDragging ? 'grabbing' : 'default'
-      }}
-    >
+    <div className={cn('relative w-full h-full', className)} style={{ backgroundColor: '#F8F8F6' }}>
       {/* Controls */}
       <TimelineControls />
 
@@ -209,7 +201,6 @@ export default function Timeline({ className }: TimelineProps) {
                 timelineStart={timelineStart}
                 timelineEnd={timelineEnd}
                 onEventClick={(event) => handleEventClick(event, property.name)}
-                draggedEventId={draggedEventId}
               />
             ))}
             </svg>
