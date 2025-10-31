@@ -44,8 +44,8 @@ export default function PropertyStatusBands({
         if (endPos < 0 || startPos > 100 || width < 0.1) return null;
 
         const color = statusColors[period.status];
-        const bandY = branchY + 15; // Position below the branch line
-        const bandHeight = 8;
+        const bandHeight = 50; // Match one grid row (50px)
+        const bandY = branchY - bandHeight / 2; // Center on branch line
 
         return (
           <g key={`status-${index}`}>
@@ -56,8 +56,9 @@ export default function PropertyStatusBands({
               width={`${Math.min(100 - startPos, width)}%`}
               height={bandHeight}
               fill={color}
-              opacity={0.4}
-              rx={2}
+              opacity={0.3}
+              rx={25}
+              style={{ pointerEvents: 'none' }}
             />
 
             {/* Status label (show if band is wide enough) */}

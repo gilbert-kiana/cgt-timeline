@@ -146,15 +146,15 @@ export default function TimelineControls() {
 
       {/* Center Controls - Timeline Navigation */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 dark:bg-slate-800 rounded-lg">
-          <Calendar className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-          <span className="text-sm text-slate-700 dark:text-slate-300">
+        <div className="flex items-center gap-2 px-3 py-1" style={{ backgroundColor: '#000000', borderRadius: '7px' }}>
+          <Calendar className="w-4 h-4" style={{ color: '#FFFFFF' }} />
+          <span className="text-sm" style={{ color: '#FFFFFF' }}>
             {format(timelineStart, 'MMM yyyy')} - {format(timelineEnd, 'MMM yyyy')}
           </span>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg">
-          <span className="text-xs text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">Pan</span>
+        <div className="flex items-center gap-2 px-3 py-2" style={{ backgroundColor: '#000000', borderRadius: '7px' }}>
+          <span className="text-xs font-medium whitespace-nowrap" style={{ color: '#FFFFFF' }}>Pan</span>
           <input
             type="range"
             min={0}
@@ -162,22 +162,22 @@ export default function TimelineControls() {
             step={0.01}
             value={getPanSliderValue()}
             onChange={(e) => handlePanSliderChange(parseFloat(e.target.value))}
-            className="w-48 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer
+            className="w-48 h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer
               [&::-webkit-slider-thumb]:appearance-none
               [&::-webkit-slider-thumb]:w-3
               [&::-webkit-slider-thumb]:h-3
               [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:bg-blue-600
+              [&::-webkit-slider-thumb]:bg-white
               [&::-webkit-slider-thumb]:cursor-pointer
-              [&::-webkit-slider-thumb]:hover:bg-blue-700
+              [&::-webkit-slider-thumb]:hover:bg-gray-200
               [&::-webkit-slider-thumb]:transition-colors
               [&::-moz-range-thumb]:w-3
               [&::-moz-range-thumb]:h-3
               [&::-moz-range-thumb]:rounded-full
-              [&::-moz-range-thumb]:bg-blue-600
+              [&::-moz-range-thumb]:bg-white
               [&::-moz-range-thumb]:border-0
               [&::-moz-range-thumb]:cursor-pointer
-              [&::-moz-range-thumb]:hover:bg-blue-700"
+              [&::-moz-range-thumb]:hover:bg-gray-200"
             title="Smooth timeline navigation"
           />
         </div>
@@ -222,8 +222,8 @@ export default function TimelineControls() {
           >
             <ZoomOut className="w-4 h-4 text-slate-600 dark:text-slate-300" />
           </button>
-          <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg min-w-[120px] text-center">
-            <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+          <div className="px-3 py-1 min-w-[120px] text-center" style={{ backgroundColor: '#000000', borderRadius: '7px' }}>
+            <div className="text-xs font-semibold" style={{ color: '#FFFFFF' }}>
               {zoomLevelLabels[zoomLevel]}
             </div>
           </div>

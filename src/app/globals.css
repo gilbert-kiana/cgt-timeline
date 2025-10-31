@@ -2,10 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400,300&display=swap');
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --color-bg: #F8F8F6;
+    --color-surface: #FFFFFF;
+    --color-text: #000000;
+    --color-text-secondary: #6B6B6B;
+    --color-accent: #FFD54F;
+    --color-accent-secondary: #8B5CF6;
+    --color-border: #E5E5E5;
+    --color-success: #4ADE80;
+    --color-error: #EF4444;
+    --radius-lg: 16px;
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --font-main: 'Satoshi', sans-serif;
+    
+    --background: 0 0% 97%;
+    --foreground: 0 0% 0%;
   }
 }
 
@@ -19,7 +34,36 @@
 }
 
 body {
-  @apply bg-background text-foreground;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-main);
+  line-height: 1.6;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+p {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
 }
 
 /* Custom scrollbar */
@@ -29,22 +73,22 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-slate-100;
+  background: var(--color-bg);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-400;
+  background: var(--color-border);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-500;
+  background: var(--color-text-secondary);
 }
 
 /* Smooth animations */
 * {
-  @apply transition-colors duration-150;
+  transition: all 0.25s ease;
 }
 
 /* Timeline specific styles */
@@ -91,17 +135,17 @@ body {
 }
 
 .timeline-scroll::-webkit-scrollbar-track {
-  @apply bg-slate-50;
-  margin-top: 48px; /* Account for sticky header */
+  background: var(--color-surface);
+  margin-top: 48px;
 }
 
 .timeline-scroll::-webkit-scrollbar-thumb {
-  @apply bg-blue-400;
+  background: var(--color-accent);
   border-radius: 5px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 .timeline-scroll::-webkit-scrollbar-thumb:hover {
-  @apply bg-blue-500;
+  background: var(--color-accent-secondary);
 }

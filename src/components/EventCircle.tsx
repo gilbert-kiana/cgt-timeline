@@ -3,7 +3,17 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { TimelineEvent } from '@/store/timeline';
-import { Home, DollarSign, TrendingUp } from 'lucide-react';
+import { 
+  Home, 
+  DollarSign, 
+  TrendingUp, 
+  LogIn, 
+  LogOut, 
+  Key, 
+  Hammer, 
+  RefreshCw, 
+  ArrowRightLeft 
+} from 'lucide-react';
 
 interface EventCircleProps {
   event: TimelineEvent;
@@ -27,14 +37,25 @@ export default function EventCircle({ event, cx, cy, color, onClick, tier = 0 }:
   const getEventIcon = () => {
     switch (event.type) {
       case 'purchase':
-        return <Home className="w-3 h-3" />;
+        return <Home className="w-4 h-4" />;
       case 'sale':
-        return <TrendingUp className="w-3 h-3" />;
+        return <TrendingUp className="w-4 h-4" />;
       case 'move_in':
+        return <LogIn className="w-4 h-4" />;
       case 'move_out':
-        return <Home className="w-3 h-3" />;
+        return <LogOut className="w-4 h-4" />;
+      case 'rent_start':
+        return <Key className="w-4 h-4" />;
+      case 'rent_end':
+        return <Key className="w-4 h-4" />;
+      case 'improvement':
+        return <Hammer className="w-4 h-4" />;
+      case 'refinance':
+        return <RefreshCw className="w-4 h-4" />;
+      case 'status_change':
+        return <ArrowRightLeft className="w-4 h-4" />;
       default:
-        return <DollarSign className="w-3 h-3" />;
+        return <DollarSign className="w-4 h-4" />;
     }
   };
 
@@ -81,13 +102,13 @@ export default function EventCircle({ event, cx, cy, color, onClick, tier = 0 }:
         />
       )}
 
-      {/* Main event circle */}
+      {/* Main event circle with border */}
       <motion.circle
         cx={cx}
         cy={cy}
-        r="14"
-        fill={color}
-        stroke="white"
+        r="16"
+        fill="white"
+        stroke={color}
         strokeWidth="3"
         initial={{ scale: 0 }}
         animate={{ scale: isHovered ? 1.15 : 1 }}
@@ -96,6 +117,31 @@ export default function EventCircle({ event, cx, cy, color, onClick, tier = 0 }:
           filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.25))',
         }}
       />
+
+      {/* Icon inside the circle */}
+      <foreignObject
+        x={`calc(${cx} - 8px)`}
+        y={cy - 8}
+        width="16"
+        height="16"
+        style={{ pointerEvents: 'none' }}
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: isHovered ? 1.15 : 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          style={{ 
+            color: color,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            height: '100%'
+          }}
+        >
+          {getEventIcon()}
+        </motion.div>
+      </foreignObject>
 
       {/* Amount indicator badge */}
       {hasAmount && (
@@ -113,44 +159,81 @@ export default function EventCircle({ event, cx, cy, color, onClick, tier = 0 }:
         />
       )}
 
-      {/* Hover tooltip */}
+      {/* Hover tooltip card */}
       {isHovered && (
         <foreignObject
           x={cx}
-          y={cy - 50}
-          width="160"
-          height="80"
+          y={cy - 80}
+          width="220"
+          height="150"
           style={{
             overflow: 'visible',
             pointerEvents: 'none',
-            transform: 'translateX(-80px)'
+            transform: 'translateX(-110px)'
           }}
         >
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-slate-800 text-white px-3 py-2 rounded-lg shadow-xl text-xs"
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            className="px-4 py-3 rounded-xl shadow-2xl"
+            style={{
+              backgroundColor: '#000000',
+              border: '2px solid #FFD54F'
+            }}
           >
-            <div className="font-semibold mb-1">{event.title}</div>
-            <div className="text-slate-300 text-[10px]">
-              {new Date(event.date).toLocaleDateString('en-US', {
-                month: 'short',
+            {/* Event Title */}
+            <div className="font-bold text-sm mb-2" style={{ color: '#FFFFFF' }}>
+              {event.title}
+            </div>
+            
+            {/* Event Type */}
+            <div className="flex items-center gap-2 mb-2">
+              <div 
+                className="w-6 h-6 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: '#FFD54F', color: '#000000' }}
+              >
+                {getEventIcon()}
+              </div>
+              <span className="text-xs capitalize" style={{ color: '#FFFFFF' }}>
+                {event.type.replace('_', ' ')}
+              </span>
+            </div>
+
+            {/* Date */}
+            <div className="text-xs mb-2" style={{ color: '#FFFFFF' }}>
+              📅 {new Date(event.date).toLocaleDateString('en-US', {
+                month: 'long',
                 day: 'numeric',
                 year: 'numeric'
               })}
             </div>
+
+            {/* Amount */}
             {hasAmount && (
-              <div className="text-green-400 font-semibold mt-1">
-                ${event.amount?.toLocaleString()}
+              <div className="text-sm font-bold mb-2" style={{ color: '#FFD54F' }}>
+                💰 ${event.amount?.toLocaleString()}
               </div>
             )}
+
+            {/* PPR Status */}
             {isPPR && (
-              <div className="text-green-400 text-[10px] mt-1">
-                ✓ Principal Residence
+              <div className="flex items-center gap-1 text-xs mb-2" style={{ color: '#FFD54F' }}>
+                <span>🏠</span>
+                <span className="font-semibold">Principal Residence</span>
               </div>
             )}
-            <div className="text-slate-400 text-[10px] mt-1">
-              Click to edit
+
+            {/* Description */}
+            {event.description && (
+              <div className="text-xs mb-2 line-clamp-2" style={{ color: '#FFFFFF' }}>
+                {event.description}
+              </div>
+            )}
+
+            {/* Click hint */}
+            <div className="text-[10px] mt-2 pt-2" style={{ color: '#6B6B6B', borderTop: '1px solid #333333' }}>
+              💡 Click to view details
             </div>
           </motion.div>
         </foreignObject>
@@ -176,7 +259,7 @@ export default function EventCircle({ event, cx, cy, color, onClick, tier = 0 }:
         x={cx}
         y={labelY}
         textAnchor="middle"
-        className="text-[14px] font-bold fill-slate-900 dark:fill-slate-100 pointer-events-none"
+        className="text-[15px] font-bold fill-slate-900 dark:fill-slate-100 pointer-events-none"
         style={{ userSelect: 'none' }}
       >
         {event.title}

@@ -90,6 +90,19 @@ export default function PropertyBranch({
 
   const eventsWithTiers = assignLabelTiers();
 
+  const purchaseEvent = sortedEvents.find(e => e.type === 'purchase') || sortedEvents[0];
+  const labelXPosition = purchaseEvent ? Math.max(1, Math.min(99, purchaseEvent.calculatedPosition)) : 5;
+
+  const LABEL_WIDTH = 300;
+  const LABEL_HEIGHT = 40;
+  const LABEL_GAP = 40;
+  const LEFT_MARGIN_THRESHOLD = 8;
+  const isLeftMargin = labelXPosition <= LEFT_MARGIN_THRESHOLD;
+  const labelY = branchY - LABEL_HEIGHT / 2 + 2;
+  const labelX = isLeftMargin 
+    ? `calc(${labelXPosition}% + ${LABEL_GAP}px)` 
+    : `calc(${labelXPosition}% - ${LABEL_GAP}px - ${LABEL_WIDTH}px)`;
+
   // Generate branch path
   const generateBranchPath = () => {
     if (eventsWithTiers.length === 0) return '';
@@ -139,22 +152,28 @@ export default function PropertyBranch({
         className="drop-shadow-sm"
       />
       
-      {/* Branch Label */}
-      <foreignObject x="10" y={branchY - 30} width="200" height="60">
-        <div className="flex items-center gap-2">
+      {/* Branch Label - positioned next to purchase date */}
+      <foreignObject 
+        x={labelX} 
+        y={labelY} 
+        width={LABEL_WIDTH} 
+        height={LABEL_HEIGHT}
+      >
+        <div className="flex items-center gap-3">
           <div 
             className={cn(
-              "w-3 h-3 rounded-full",
+              "w-8 h-8 rounded-[10px]",
               isSelected && "ring-2 ring-offset-2 ring-slate-400"
             )}
             style={{ backgroundColor: property.color }}
           />
           <span className={cn(
-            "font-semibold text-sm transition-all",
+            "font-bold transition-all whitespace-nowrap overflow-hidden text-ellipsis max-w-[250px]",
             isSelected
               ? "text-slate-900 dark:text-slate-100"
-              : "text-slate-600 dark:text-slate-400"
-          )}>
+              : "text-slate-700 dark:text-slate-300"
+          )}
+          style={{ fontSize: '18px' }}>
             {property.name}
           </span>
         </div>
