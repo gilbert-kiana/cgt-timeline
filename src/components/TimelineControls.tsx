@@ -146,15 +146,15 @@ export default function TimelineControls() {
 
       {/* Center Controls - Timeline Navigation */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 dark:bg-slate-800 rounded-lg">
-          <Calendar className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-          <span className="text-sm text-slate-700 dark:text-slate-300">
+        <div className="flex items-center gap-2 px-3 py-1" style={{ backgroundColor: '#FFFFFF', borderRadius: '7px' }}>
+          <Calendar className="w-4 h-4" style={{ color: '#000000' }} />
+          <span className="text-sm" style={{ color: '#000000' }}>
             {format(timelineStart, 'MMM yyyy')} - {format(timelineEnd, 'MMM yyyy')}
           </span>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800 rounded-lg">
-          <span className="text-xs text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">Pan</span>
+        <div className="flex items-center gap-2 px-3 py-2" style={{ backgroundColor: '#FFFFFF', borderRadius: '7px' }}>
+          <span className="text-xs font-medium whitespace-nowrap" style={{ color: '#000000' }}>Pan</span>
           <input
             type="range"
             min={0}
@@ -222,8 +222,8 @@ export default function TimelineControls() {
           >
             <ZoomOut className="w-4 h-4 text-slate-600 dark:text-slate-300" />
           </button>
-          <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg min-w-[120px] text-center">
-            <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+          <div className="px-3 py-1 min-w-[120px] text-center" style={{ backgroundColor: '#FFFFFF', borderRadius: '7px' }}>
+            <div className="text-xs font-semibold" style={{ color: '#000000' }}>
               {zoomLevelLabels[zoomLevel]}
             </div>
           </div>

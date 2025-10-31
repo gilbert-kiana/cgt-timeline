@@ -119,7 +119,7 @@ export default function Timeline({ className }: TimelineProps) {
   }, [isDragging, draggedEventId, moveEvent]);
 
   return (
-    <div className={cn('relative w-full h-full bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800', className)}>
+    <div className={cn('relative w-full h-full', className)} style={{ backgroundColor: '#F8F8F6' }}>
       {/* Controls */}
       <TimelineControls />
 
@@ -133,14 +133,7 @@ export default function Timeline({ className }: TimelineProps) {
           onMouseLeave={() => setHoveredDate(null)}
         >
           {/* Scrollable Content Wrapper */}
-          <div className="relative" style={{ minHeight: `${minContentHeight}px` }}>
-            {/* Background Grid */}
-            <div className="absolute inset-0 opacity-5">
-              <div className="h-full w-full" style={{
-                backgroundImage: 'linear-gradient(90deg, #000 1px, transparent 1px), linear-gradient(#000 1px, transparent 1px)',
-                backgroundSize: '50px 50px',
-              }} />
-            </div>
+          <div className="relative bg-white dark:from-slate-900 dark:to-slate-800" style={{ minHeight: `${minContentHeight}px` }}>
 
             {/* Timeline Markers - Sticky */}
             <div className="sticky top-0 left-0 right-0 h-12 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 z-20">
@@ -165,9 +158,12 @@ export default function Timeline({ className }: TimelineProps) {
                   </div>
                   <div
                     className={cn(
-                      'absolute top-full h-full',
-                      isYear ? 'w-0.5 bg-slate-300 dark:bg-slate-600' : isMinor ? 'w-px bg-slate-100 dark:bg-slate-800' : 'w-px bg-slate-200 dark:bg-slate-700'
+                      'absolute top-full h-full'
                     )}
+                    style={{ 
+                      width: isYear ? '2px' : '1px',
+                      backgroundColor: '#FFD54F'
+                    }}
                   />
                 </div>
               );
@@ -177,10 +173,12 @@ export default function Timeline({ className }: TimelineProps) {
             {/* Hover Date Indicator */}
             {hoveredDate && (
               <div
-                className="absolute top-14 px-2 py-1 bg-slate-800 text-white text-xs rounded pointer-events-none z-50"
+                className="absolute top-14 px-3 py-2 text-white text-xs rounded pointer-events-none z-50"
                 style={{
                   left: `${dateToPosition(hoveredDate, timelineStart, timelineEnd)}%`,
-                  transform: 'translateX(-50%)'
+                  transform: 'translateX(-50%)',
+                  backgroundColor: '#000000',
+                  border: '1px solid #FFD54F'
                 }}
               >
                 {format(hoveredDate, 'dd MMM yyyy')}
