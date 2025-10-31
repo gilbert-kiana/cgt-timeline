@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Home } from 'lucide-react';
 import { Property, TimelineEvent } from '@/store/timeline';
 import EventCircle from './EventCircle';
 import PropertyStatusBands from './PropertyStatusBands';
@@ -162,11 +163,13 @@ export default function PropertyBranch({
         <div className="flex items-center gap-3">
           <div 
             className={cn(
-              "w-8 h-8 rounded-[10px]",
+              "w-8 h-8 rounded-full flex items-center justify-center",
               isSelected && "ring-2 ring-offset-2 ring-slate-400"
             )}
-            style={{ backgroundColor: property.color }}
-          />
+            style={{ backgroundColor: '#000000' }}
+          >
+            <Home className="w-4 h-4" style={{ color: '#FFD54F' }} />
+          </div>
           <span className={cn(
             "font-bold transition-all whitespace-nowrap overflow-hidden text-ellipsis max-w-[250px]",
             isSelected

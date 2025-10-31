@@ -132,13 +132,13 @@ export default function TimelineControls() {
     <div className="absolute top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 flex items-center justify-between z-30">
       {/* Left Controls */}
       <div className="flex items-center gap-4">
-        <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">CGT Brain AI Timeline</h1>
+        <h1 className="font-bold text-slate-800 dark:text-slate-100" style={{ fontSize: '12px' }}>CGT Brain AI Timeline</h1>
         <div className="flex items-center gap-2 border-l border-slate-200 dark:border-slate-700 pl-4">
-          <span className="text-sm text-slate-500 dark:text-slate-400">
+          <span className="text-slate-500 dark:text-slate-400" style={{ fontSize: '12px' }}>
             {properties.length} {properties.length === 1 ? 'Property' : 'Properties'}
           </span>
           <span className="text-slate-300 dark:text-slate-600">•</span>
-          <span className="text-sm text-slate-500 dark:text-slate-400">
+          <span className="text-slate-500 dark:text-slate-400" style={{ fontSize: '12px' }}>
             {events.length} {events.length === 1 ? 'Event' : 'Events'}
           </span>
         </div>
@@ -148,13 +148,13 @@ export default function TimelineControls() {
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 px-3 py-1" style={{ backgroundColor: '#000000', borderRadius: '7px' }}>
           <Calendar className="w-4 h-4" style={{ color: '#FFFFFF' }} />
-          <span className="text-sm" style={{ color: '#FFFFFF' }}>
+          <span style={{ color: '#FFFFFF', fontSize: '12px' }}>
             {format(timelineStart, 'MMM yyyy')} - {format(timelineEnd, 'MMM yyyy')}
           </span>
         </div>
 
         <div className="flex items-center gap-2 px-3 py-2" style={{ backgroundColor: '#000000', borderRadius: '7px' }}>
-          <span className="text-xs font-medium whitespace-nowrap" style={{ color: '#FFFFFF' }}>Pan</span>
+          <span className="font-medium whitespace-nowrap" style={{ color: '#FFFFFF', fontSize: '12px' }}>Pan</span>
           <input
             type="range"
             min={0}
@@ -223,7 +223,7 @@ export default function TimelineControls() {
             <ZoomOut className="w-4 h-4 text-slate-600 dark:text-slate-300" />
           </button>
           <div className="px-3 py-1 min-w-[120px] text-center" style={{ backgroundColor: '#000000', borderRadius: '7px' }}>
-            <div className="text-xs font-semibold" style={{ color: '#FFFFFF' }}>
+            <div className="font-semibold" style={{ color: '#FFFFFF', fontSize: '12px' }}>
               {zoomLevelLabels[zoomLevel]}
             </div>
           </div>
