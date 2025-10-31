@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TimelineEvent } from '@/store/timeline';
 import { 
@@ -12,7 +12,8 @@ import {
   Key, 
   Hammer, 
   RefreshCw, 
-  ArrowRightLeft 
+  ArrowRightLeft,
+  GripVertical
 } from 'lucide-react';
 
 interface EventCircleProps {
@@ -21,11 +22,89 @@ interface EventCircleProps {
   cy: number; // Y position
   color: string;
   onClick: () => void;
+  onDragStart?: (eventId: string) => void;
+  isDragging?: boolean;
   tier?: number; // Vertical tier for label positioning (0 = default, 1-3 = higher tiers)
 }
 
-export default function EventCircle({ event, cx, cy, color, onClick, tier = 0 }: EventCircleProps) {
+export default function EventCircle({ event, cx, cy, color, onClick, onDragStart, isDragging = false, tier = 0 }: EventCircleProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const HOVER_DELAY = 300; // ms
+  const MOVEMENT_THRESHOLD = 5; // px
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isDragging) {
+      setShowTooltip(false);
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    }
+  }, [isDragging]);
+
+  const handlePointerEnter = () => {
+    setIsHovered(true);
+    
+    hoverTimeoutRef.current = setTimeout(() => {
+      if (!isDragging) {
+        setShowTooltip(true);
+      }
+    }, HOVER_DELAY);
+  };
+
+  const handlePointerLeave = () => {
+    setIsHovered(false);
+    setShowTooltip(false);
+    pointerStartRef.current = null;
+    
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (pointerStartRef.current && hoverTimeoutRef.current) {
+      const dx = e.clientX - pointerStartRef.current.x;
+      const dy = e.clientY - pointerStartRef.current.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (distance > MOVEMENT_THRESHOLD) {
+        clearTimeout(hoverTimeoutRef.current);
+        hoverTimeoutRef.current = null;
+        setShowTooltip(false);
+      }
+    }
+  };
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    pointerStartRef.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleDragHandlePointerDown = (e: React.PointerEvent) => {
+    e.stopPropagation();
+    
+    setShowTooltip(false);
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    
+    if (onDragStart) {
+      onDragStart(event.id);
+    }
+  };
 
   // Calculate label Y position based on tier
   // Each tier adds vertical space to avoid overlap
@@ -65,8 +144,10 @@ export default function EventCircle({ event, cx, cy, color, onClick, tier = 0 }:
   return (
     <g
       className="event-circle-group cursor-pointer"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+      onPointerMove={handlePointerMove}
+      onPointerDown={handlePointerDown}
       onClick={(e) => {
         e.stopPropagation();
         onClick();
@@ -159,8 +240,51 @@ export default function EventCircle({ event, cx, cy, color, onClick, tier = 0 }:
         />
       )}
 
+      {/* Drag handle - appears on hover */}
+      {isHovered && onDragStart && !isDragging && (
+        <g
+          onPointerDown={handleDragHandlePointerDown}
+          style={{ cursor: 'grab' }}
+          className="drag-handle"
+        >
+          <motion.circle
+            cx={cx}
+            cy={cy}
+            r="28"
+            fill="transparent"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+          />
+          <foreignObject
+            x={`calc(${cx} - 10px)`}
+            y={cy - 32}
+            width="20"
+            height="20"
+            style={{ pointerEvents: 'none' }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.15 }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                height: '100%',
+                color: color,
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+              }}
+            >
+              <GripVertical className="w-5 h-5" />
+            </motion.div>
+          </foreignObject>
+        </g>
+      )}
+
       {/* Hover tooltip card */}
-      {isHovered && (
+      {showTooltip && !isDragging && (
         <foreignObject
           x={cx}
           y={cy - 80}
