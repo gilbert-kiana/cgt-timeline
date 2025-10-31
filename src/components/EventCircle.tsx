@@ -12,7 +12,8 @@ import {
   Key, 
   Hammer, 
   RefreshCw, 
-  ArrowRightLeft 
+  ArrowRightLeft,
+  GripVertical
 } from 'lucide-react';
 
 interface EventCircleProps {
@@ -22,10 +23,13 @@ interface EventCircleProps {
   color: string;
   onClick: () => void;
   tier?: number; // Vertical tier for label positioning (0 = default, 1-3 = higher tiers)
+  onDragStart?: (eventId: string) => void;
+  draggedEventId?: string | null;
 }
 
-export default function EventCircle({ event, cx, cy, color, onClick, tier = 0 }: EventCircleProps) {
+export default function EventCircle({ event, cx, cy, color, onClick, tier = 0, onDragStart, draggedEventId }: EventCircleProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const isDragging = draggedEventId === event.id;
 
   // Calculate label Y position based on tier
   // Each tier adds vertical space to avoid overlap
@@ -160,15 +164,15 @@ export default function EventCircle({ event, cx, cy, color, onClick, tier = 0 }:
       )}
 
       {/* Hover tooltip card */}
-      {isHovered && (
+      {(isHovered || isDragging) && (
         <foreignObject
           x={cx}
           y={cy - 80}
           width="220"
-          height="150"
+          height="180"
           style={{
             overflow: 'visible',
-            pointerEvents: 'none',
+            pointerEvents: 'auto',
             transform: 'translateX(-110px)'
           }}
         >
@@ -231,10 +235,33 @@ export default function EventCircle({ event, cx, cy, color, onClick, tier = 0 }:
               </div>
             )}
 
+            {/* Drag to move row */}
+            {onDragStart && (
+              <div 
+                className="flex items-center gap-2 mt-2 pt-2 px-2 py-1 rounded"
+                style={{ 
+                  color: '#FFD54F', 
+                  borderTop: '1px solid #333333',
+                  cursor: isDragging ? 'grabbing' : 'grab',
+                  backgroundColor: isDragging ? 'rgba(255, 213, 79, 0.1)' : 'transparent'
+                }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onDragStart(event.id);
+                }}
+              >
+                <GripVertical className="w-4 h-4" />
+                <span className="text-xs font-semibold">Drag to move</span>
+              </div>
+            )}
+
             {/* Click hint */}
-            <div className="text-[10px] mt-2 pt-2" style={{ color: '#6B6B6B', borderTop: '1px solid #333333' }}>
-              💡 Click to view details
-            </div>
+            {!isDragging && (
+              <div className="text-[10px] mt-2 pt-2" style={{ color: '#6B6B6B', borderTop: '1px solid #333333' }}>
+                💡 Click to view details
+              </div>
+            )}
           </motion.div>
         </foreignObject>
       )}

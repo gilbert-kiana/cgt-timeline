@@ -201,6 +201,7 @@ export default function Timeline({ className }: TimelineProps) {
                 timelineStart={timelineStart}
                 timelineEnd={timelineEnd}
                 onEventClick={(event) => handleEventClick(event, property.name)}
+                draggedEventId={draggedEventId}
               />
             ))}
             </svg>
